@@ -35,6 +35,8 @@ import { Progress } from "@/components/ui/progress"
 import { Notifications } from "@/components/Notifications"
 import { AIExplainer } from "@/components/AIExplainer"
 import { FleetHealthMonitor } from "@/components/operator/FleetHealthMonitor"
+import { VoyagePerformance } from "@/components/operator/VoyagePerformance"
+import { VesselPerformance } from "@/components/operator/VesselPerformance"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useStore } from "@/lib/store"
 import {
@@ -270,6 +272,8 @@ export default function OperatorPage() {
               )}
             </TabsTrigger>
             <TabsTrigger value="monitoring">Monitoring</TabsTrigger>
+            <TabsTrigger value="performance">Voyage Performance</TabsTrigger>
+            <TabsTrigger value="vessel-performance">Vessel Performance</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
           </TabsList>
 
@@ -642,6 +646,16 @@ export default function OperatorPage() {
           {/* Monitoring Tab - Fleet Health Monitor */}
           <TabsContent value="monitoring" className="space-y-6">
             <FleetHealthMonitor />
+          </TabsContent>
+
+          {/* Voyage Performance Tab */}
+          <TabsContent value="performance" className="space-y-6">
+            <VoyagePerformance />
+          </TabsContent>
+
+          {/* Vessel Performance Tab */}
+          <TabsContent value="vessel-performance" className="space-y-6">
+            <VesselPerformance />
           </TabsContent>
 
           {/* Analytics Tab */}
