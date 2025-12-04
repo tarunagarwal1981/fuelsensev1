@@ -1023,7 +1023,7 @@ export default function SupplierPage() {
                         const vessel = vessels.find(
                           (v) => v.cargoId === plan.cargoId
                         )
-                        return (
+  return (
                           <TableRow key={plan.id}>
                             <TableCell>
                               {format(

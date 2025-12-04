@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -21,6 +21,9 @@ import {
 } from "lucide-react"
 import { format, formatDistanceToNow } from "date-fns"
 import { cn } from "@/lib/utils"
+import { BunkerPortAnalysis } from "./BunkerPortAnalysis"
+import { MarketIntelligence } from "./MarketIntelligence"
+import { ViabilityAssessment } from "./ViabilityAssessment"
 
 /**
  * Featured Cargo Card - Large prominent card showing the best cargo match
@@ -29,6 +32,8 @@ import { cn } from "@/lib/utils"
 export function FeaturedCargoCard({ cargo, onFix, onViewDetails, onAskAI, onSkip }) {
   const [showFinancialDetails, setShowFinancialDetails] = useState(false)
   const [showBunkerDetails, setShowBunkerDetails] = useState(false)
+  const [showBunkerAnalysis, setShowBunkerAnalysis] = useState(false)
+  const bunkerAnalysisRef = useRef(null)
 
   if (!cargo) return null
 
@@ -92,71 +97,30 @@ export function FeaturedCargoCard({ cargo, onFix, onViewDetails, onAskAI, onSkip
           </div>
         </div>
 
-        {/* Viability Check */}
-        <div className="space-y-3">
-          <h3 className="text-sm font-semibold text-gray-900">VIABILITY CHECK</h3>
-          
-          <div className="space-y-2">
-            {/* Bunker Available */}
-            {isViable ? (
-              <div className="flex items-start gap-3 p-3 bg-green-50 rounded-md border border-green-200">
-                <CheckCircle2 className="h-5 w-5 text-success mt-0.5 flex-shrink-0" />
-                <div className="flex-1">
-                  <div className="font-medium text-sm text-gray-900">
-                    Bunker Available: {bunkerPortCount} port{bunkerPortCount !== 1 ? 's' : ''} found
-                  </div>
-                  {primaryBunker && (
-                    <div className="text-xs text-gray-600 mt-1">
-                      {primaryBunker.name} ${primaryBunker.price}/MT • {primaryBunker.alternatives?.[0]?.name && `${primaryBunker.alternatives[0].name} $${primaryBunker.alternatives[0].pricePerMT}/MT`}
-                    </div>
-                  )}
-                </div>
-              </div>
-            ) : (
-              <div className="flex items-start gap-3 p-3 bg-red-50 rounded-md border border-red-200">
-                <XCircle className="h-5 w-5 text-danger mt-0.5 flex-shrink-0" />
-                <div className="flex-1">
-                  <div className="font-medium text-sm text-gray-900">
-                    ❌ CANNOT FIX - No bunker options available
-                  </div>
-                  <div className="text-xs text-gray-600 mt-1">
-                    No bunker ports found on this route
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Vessel Ready */}
-            <div className="flex items-start gap-3 p-3 bg-green-50 rounded-md border border-green-200">
-              <CheckCircle2 className="h-5 w-5 text-success mt-0.5 flex-shrink-0" />
-              <div className="flex-1">
-                <div className="font-medium text-sm text-gray-900">
-                  Vessel Ready: {cargo.vessel} ({format(new Date(cargo.laycanStart), "MMM d")})
-                </div>
-              </div>
-            </div>
-
-            {/* Timing */}
-            <div className="flex items-start gap-3 p-3 bg-green-50 rounded-md border border-green-200">
-              <CheckCircle2 className="h-5 w-5 text-success mt-0.5 flex-shrink-0" />
-              <div className="flex-1">
-                <div className="font-medium text-sm text-gray-900">
-                  Timing Fits: Laycan {format(new Date(cargo.laycanStart), "MMM d")} - {format(new Date(cargo.laycanEnd), "MMM d")}
-                </div>
-              </div>
-            </div>
-
-            {/* Weather Risk */}
-            <div className="flex items-start gap-3 p-3 bg-yellow-50 rounded-md border border-yellow-200">
-              <AlertTriangle className="h-5 w-5 text-warning mt-0.5 flex-shrink-0" />
-              <div className="flex-1">
-                <div className="font-medium text-sm text-gray-900">
-                  ⚠️ Weather: 15% delay risk (manageable)
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        {/* Enhanced Viability Assessment */}
+        <ViabilityAssessment
+          cargo={cargo}
+          onRevalidate={async () => {
+            // Simulate re-validation
+            await new Promise(resolve => setTimeout(resolve, 2000))
+          }}
+          onViewRiskReport={(action) => {
+            // Handle navigation to different views
+            if (action === "bunker_analysis") {
+              // Expand and scroll to bunker analysis section
+              setShowBunkerAnalysis(true)
+              setTimeout(() => {
+                bunkerAnalysisRef.current?.scrollIntoView({ behavior: "smooth", block: "center" })
+              }, 100)
+            } else if (action === "weather") {
+              // Open weather forecast
+              console.log("Open weather forecast")
+            } else if (action === "risk_report") {
+              // Open full risk report modal
+              console.log("Open risk report")
+            }
+          }}
+        />
 
         <Separator />
 
@@ -211,6 +175,9 @@ export function FeaturedCargoCard({ cargo, onFix, onViewDetails, onAskAI, onSkip
           )}
         </div>
 
+        {/* Market Intelligence (New expandable section) */}
+        <MarketIntelligence cargo={cargo} />
+
         {/* Bunker Plan (Expandable) */}
         {primaryBunker && (
           <div className="border rounded-md">
@@ -249,6 +216,20 @@ export function FeaturedCargoCard({ cargo, onFix, onViewDetails, onAskAI, onSkip
                 )}
               </div>
             )}
+          </div>
+        )}
+
+        {/* Bunker Port Analysis (New expandable section) */}
+        {cargo.bunkerPorts && cargo.bunkerPorts.length > 1 && (
+          <div ref={bunkerAnalysisRef}>
+            <BunkerPortAnalysis
+              cargo={cargo}
+              defaultExpanded={showBunkerAnalysis}
+              onSelectPort={(port) => {
+                // Handle port selection - could update the cargo's primary bunker port
+                console.log("Selected port:", port)
+              }}
+            />
           </div>
         )}
 

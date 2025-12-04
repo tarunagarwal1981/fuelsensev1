@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -119,14 +120,15 @@ export function ChartererSidebar({ activeView, onViewChange, filters, onFiltersC
           <CheckCircle2 className="h-4 w-4 mr-2" />
           Fixed Cargoes
         </Button>
-        <Button
-          variant={activeView === "performance" ? "default" : "ghost"}
-          className="w-full justify-start"
-          onClick={() => onViewChange("performance")}
-        >
-          <TrendingUp className="h-4 w-4 mr-2" />
-          Performance
-        </Button>
+        <Link href="/charterer/performance" className="w-full">
+          <Button
+            variant="ghost"
+            className="w-full justify-start"
+          >
+            <TrendingUp className="h-4 w-4 mr-2" />
+            Performance
+          </Button>
+        </Link>
       </nav>
 
       {/* Pending Tasks */}
