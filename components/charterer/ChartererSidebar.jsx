@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { usePathname } from "next/navigation"
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -26,6 +27,8 @@ import { cn } from "@/lib/utils"
  */
 export function ChartererSidebar({ activeView, onViewChange, filters, onFiltersChange, cargoes }) {
   const { getPendingTasksByUser, currentUser } = useStore()
+  const pathname = usePathname()
+  const isPerformancePage = pathname === "/charterer/performance"
   
   // Initialize local state from props
   const [profitRange, setProfitRange] = useState([0, 500])
@@ -97,38 +100,41 @@ export function ChartererSidebar({ activeView, onViewChange, filters, onFiltersC
       {/* Navigation */}
       <nav className="p-4 space-y-1 border-b">
         <Button
-          variant={activeView === "dashboard" ? "default" : "ghost"}
+          variant={!isPerformancePage && activeView === "dashboard" ? "default" : "ghost"}
           className="w-full justify-start"
-          onClick={() => onViewChange("dashboard")}
+          asChild
         >
-          <BarChart3 className="h-4 w-4 mr-2" />
-          Dashboard
+          <Link href="/charterer">
+            <BarChart3 className="h-4 w-4 mr-2" />
+            Dashboard
+          </Link>
         </Button>
         <Button
-          variant={activeView === "all-cargoes" ? "default" : "ghost"}
+          variant={!isPerformancePage && activeView === "all-cargoes" ? "default" : "ghost"}
           className="w-full justify-start"
-          onClick={() => onViewChange("all-cargoes")}
+          onClick={() => !isPerformancePage && onViewChange("all-cargoes")}
         >
           <List className="h-4 w-4 mr-2" />
           All Cargoes
         </Button>
         <Button
-          variant={activeView === "fixed" ? "default" : "ghost"}
+          variant={!isPerformancePage && activeView === "fixed" ? "default" : "ghost"}
           className="w-full justify-start"
-          onClick={() => onViewChange("fixed")}
+          onClick={() => !isPerformancePage && onViewChange("fixed")}
         >
           <CheckCircle2 className="h-4 w-4 mr-2" />
           Fixed Cargoes
         </Button>
-        <Link href="/charterer/performance" className="w-full">
-          <Button
-            variant="ghost"
-            className="w-full justify-start"
-          >
+        <Button
+          variant={isPerformancePage ? "default" : "ghost"}
+          className="w-full justify-start"
+          asChild
+        >
+          <Link href="/charterer/performance">
             <TrendingUp className="h-4 w-4 mr-2" />
             Performance
-          </Button>
-        </Link>
+          </Link>
+        </Button>
       </nav>
 
       {/* Pending Tasks */}

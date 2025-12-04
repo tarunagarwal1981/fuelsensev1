@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useMemo, useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import {
@@ -21,6 +21,7 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Notifications } from "@/components/Notifications"
+import { ChartererSidebar } from "@/components/charterer/ChartererSidebar"
 import { useStore } from "@/lib/store"
 import { cn } from "@/lib/utils"
 import { Building2, CalendarDays, TrendingUp, TrendingDown, Download, Mail, RefreshCw } from "lucide-react"
@@ -346,6 +347,12 @@ export default function ChartererPerformancePage() {
   const router = useRouter()
   const { currentUser, cargoes } = useStore()
   const [range, setRange] = useState("month") // 'month' | '30d' | 'quarter' | 'ytd'
+  const [filters, setFilters] = useState({
+    profitRange: "all",
+    riskLevel: "all",
+    bunkerAvailable: "all",
+    status: "all",
+  })
 
   // Mocked metrics from cargoes
   const metrics = useMemo(() => {
@@ -378,9 +385,21 @@ export default function ChartererPerformancePage() {
     { month: "Dec", actual: 3.2, target: 3.0 },
   ]
 
-  // Auth guard
+  // Auth guard - redirect if not authorized
+  useEffect(() => {
+    if (!currentUser || currentUser.role !== "CHARTERER") {
+      router.push("/charterer")
+    }
+  }, [currentUser, router])
+
   if (!currentUser || currentUser.role !== "CHARTERER") {
-    return null
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -414,7 +433,26 @@ export default function ChartererPerformancePage() {
         </div>
       </header>
 
-      <main className="p-6 space-y-6">
+      <div className="flex">
+        {/* Sidebar (20%) */}
+        <ChartererSidebar
+          activeView="performance"
+          onViewChange={(view) => {
+            if (view === "dashboard") {
+              router.push("/charterer")
+            } else if (view === "all-cargoes") {
+              router.push("/charterer")
+            } else if (view === "fixed") {
+              router.push("/charterer")
+            }
+          }}
+          filters={filters}
+          onFiltersChange={setFilters}
+          cargoes={cargoes}
+        />
+
+        {/* Main Content (80%) */}
+        <main className="flex-1 p-6 space-y-6">
         {/* Range filters */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm text-gray-600">
@@ -505,7 +543,8 @@ export default function ChartererPerformancePage() {
           <TopRoutesTable />
           <AiPerformanceInsights />
         </section>
-      </main>
+        </main>
+      </div>
     </div>
   )
 }
