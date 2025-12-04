@@ -32,6 +32,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Progress } from "@/components/ui/progress"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Notifications } from "@/components/Notifications"
+import { VesselTodayDashboard } from "@/components/vessel/VesselTodayDashboard"
 import { useStore } from "@/lib/store"
 import {
   Ship,
@@ -62,7 +63,7 @@ export default function VesselPage() {
     flagVesselIssue,
   } = useStore()
 
-  const [activeTab, setActiveTab] = useState("current")
+  const [activeTab, setActiveTab] = useState("today")
   const [selectedVesselImo, setSelectedVesselImo] = useState(null)
   const [isIssueDialogOpen, setIsIssueDialogOpen] = useState(false)
   const [issueType, setIssueType] = useState("")
@@ -229,6 +230,9 @@ export default function VesselPage() {
       <main className="p-3 sm:p-4 lg:p-6">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="w-full max-w-xl mb-4 overflow-x-auto">
+            <TabsTrigger value="today" className="flex-1 text-xs sm:text-sm">
+              Today
+            </TabsTrigger>
             <TabsTrigger value="current" className="flex-1 text-xs sm:text-sm">
               Current Voyage
             </TabsTrigger>
@@ -243,7 +247,12 @@ export default function VesselPage() {
             </TabsTrigger>
           </TabsList>
 
-          {/* TAB 1: Current Voyage */}
+          {/* TAB 1: Today Dashboard */}
+          <TabsContent value="today" className="space-y-4 sm:space-y-6">
+            <VesselTodayDashboard />
+          </TabsContent>
+
+          {/* TAB 2: Current Voyage */}
           <TabsContent value="current" className="space-y-4 sm:space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
               {/* Vessel Info */}
