@@ -65,6 +65,7 @@ export function FleetHealthMonitor() {
             safeMinimum: 180,
             consumptionRate: `${plannedConsumption} MT/day`,
             timeToCritical: hoursToPort ? `${Math.round(hoursToPort)} hours` : "Unknown",
+            matchesETA: hoursToPort && Math.abs(hoursToPort - (hoursToPort || 0)) < 2 ? "⚠️ MATCHES ETA!" : "",
           },
         })
         if (!bunkerPlan) {
@@ -80,14 +81,17 @@ export function FleetHealthMonitor() {
           issues.push({
             type: "pending_approval",
             severity: "critical",
-            message: `Plan submitted ${formatDistanceToNow(new Date(bunkerPlan.createdAt), { addSuffix: true })} (${bunkerPlan.id})`,
+            message: `No bunker plan approved yet`,
             details: {
-              planId: bunkerPlan.id,
-              submittedAt: bunkerPlan.createdAt,
+              planSubmitted: `Plan submitted ${formatDistanceToNow(new Date(bunkerPlan.createdAt), { addSuffix: true })} (${bunkerPlan.id})`,
+              waitingFor: "Waiting for your approval",
             },
           })
         }
-        aiRecommendation = `URGENT: ${bunkerPlan && bunkerPlan.status === "PENDING_APPROVAL" ? "Approve bunker plan " + bunkerPlan.id + " immediately." : "Create and approve bunker plan immediately."} Vessel will arrive ${vessel.nextPort || "next port"} with <100 MT if delayed. This is a critical safety situation.`
+        const planAction = bunkerPlan && bunkerPlan.status === "PENDING_APPROVAL" 
+          ? `Approve bunker plan ${bunkerPlan.id} immediately.` 
+          : "Create and approve bunker plan immediately."
+        aiRecommendation = `URGENT: ${planAction} Vessel will arrive ${vessel.nextPort || "next port"} with <100 MT if delayed by weather. No alternative bunker ports within range. This is a critical safety situation.`
       }
       // Attention: Over-consuming fuel
       else if (consumptionDiff > 10) {
@@ -387,23 +391,66 @@ export function FleetHealthMonitor() {
                   {/* Actions */}
                   <div className="flex flex-wrap gap-2">
                     {priority === "critical" && bunkerPlan && bunkerPlan.status === "PENDING_APPROVAL" && (
-                      <Button size="sm" className="bg-danger hover:bg-red-600">
+                      <Button 
+                        size="sm" 
+                        className="bg-danger hover:bg-red-600"
+                        onClick={() => {
+                          // In a real app, this would open the approval dialog
+                          console.log("Approve bunker plan:", bunkerPlan.id)
+                        }}
+                      >
                         <CheckCircle2 className="h-3 w-3 mr-1" />
                         Approve Bunker Plan Now
                       </Button>
                     )}
-                    <Button variant="outline" size="sm">
-                      <Phone className="h-3 w-3 mr-1" />
-                      Contact Vessel
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      <MapPin className="h-3 w-3 mr-1" />
-                      View on Map
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      <FileText className="h-3 w-3 mr-1" />
-                      Full Details
-                    </Button>
+                    {priority === "attention" && (
+                      <>
+                        <Button variant="outline" size="sm">
+                          <Phone className="h-3 w-3 mr-1" />
+                          Contact Vessel
+                        </Button>
+                        <Button variant="outline" size="sm">
+                          <TrendingUp className="h-3 w-3 mr-1" />
+                          View Consumption Trend
+                        </Button>
+                        <Button variant="outline" size="sm">
+                          <FileText className="h-3 w-3 mr-1" />
+                          Investigation Report
+                        </Button>
+                        <Button variant="outline" size="sm">
+                          <CheckCircle2 className="h-3 w-3 mr-1" />
+                          Acknowledge
+                        </Button>
+                      </>
+                    )}
+                    {priority === "critical" && (
+                      <>
+                        <Button variant="outline" size="sm">
+                          <Phone className="h-3 w-3 mr-1" />
+                          Contact Vessel
+                        </Button>
+                        <Button variant="outline" size="sm">
+                          <MapPin className="h-3 w-3 mr-1" />
+                          View on Map
+                        </Button>
+                        <Button variant="outline" size="sm">
+                          <FileText className="h-3 w-3 mr-1" />
+                          Full Details
+                        </Button>
+                      </>
+                    )}
+                    {priority === "attention" && issues.some(i => i.type === "bunker_soon") && (
+                      <>
+                        <Button variant="outline" size="sm">
+                          <FileText className="h-3 w-3 mr-1" />
+                          View Bunker Plan
+                        </Button>
+                        <Button variant="outline" size="sm">
+                          <MapPin className="h-3 w-3 mr-1" />
+                          Track Progress
+                        </Button>
+                      </>
+                    )}
                   </div>
 
                   {/* Last Report */}
