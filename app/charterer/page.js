@@ -303,14 +303,6 @@ export default function ChartererPage() {
             </div>
           )}
 
-          {activeView === "performance" && (
-            <div className="space-y-4">
-              <h2 className="text-2xl font-bold text-gray-900">Performance</h2>
-              <div className="bg-white rounded-lg border p-8 text-center text-gray-500">
-                <p>Performance analytics coming soon</p>
-              </div>
-            </div>
-          )}
         </main>
       </div>
 
