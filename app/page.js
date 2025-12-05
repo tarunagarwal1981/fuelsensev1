@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Building2, Users, Ship, Fuel, TrendingUp, DollarSign, Zap } from "lucide-react"
+import { Building2, Users, Ship, Fuel, TrendingUp, DollarSign, Zap, Settings } from "lucide-react"
 import { useStore } from "@/lib/store"
 import { useMemo } from "react"
 import { cn } from "@/lib/utils"
@@ -51,6 +51,18 @@ export default function Home() {
       buttonColor: "bg-warning hover:bg-yellow-600",
     },
     {
+      role: "VESSEL_MANAGER",
+      name: "Vessel Manager",
+      description: "Oversee fleet technical performance",
+      icon: Settings,
+      href: "/vessel-manager",
+      color: "orange",
+      bgGradient: "from-orange-50 to-orange-100/50",
+      borderColor: "border-orange-300",
+      iconColor: "text-orange-600",
+      buttonColor: "bg-orange-600 hover:bg-orange-700",
+    },
+    {
       role: "SUPPLIER",
       name: "Supplier",
       description: "Manage nominations",
@@ -71,7 +83,7 @@ export default function Home() {
       acc[role.role] = tasks.reduce((sum, task) => sum + (task.count || 1), 0)
       return acc
     }, {})
-  }, [getPendingTasksByUser])
+  }, [getPendingTasksByUser, roles])
 
   const handleRoleSelect = (roleData) => {
     // Set current user in store
@@ -105,7 +117,7 @@ export default function Home() {
         </div>
 
         {/* Role Selection Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6 mb-12">
           {roles.map((roleData) => {
             const Icon = roleData.icon
             const taskCount = roleTaskCounts[roleData.role] || 0
