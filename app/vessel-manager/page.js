@@ -1,12 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Notifications } from "@/components/Notifications"
 import { ArrowLeft } from "lucide-react"
+import { useStore } from "@/lib/store"
+import { VesselManagerSidebar } from "@/components/vessel-manager/VesselManagerSidebar"
 import { OverviewTab } from "@/components/vessel-manager/OverviewTab"
 import { VesselsTab } from "@/components/vessel-manager/VesselsTab"
 import { MaintenanceTab } from "@/components/vessel-manager/MaintenanceTab"
@@ -15,7 +16,36 @@ import { CostsTab } from "@/components/vessel-manager/CostsTab"
 
 export default function VesselManagerPage() {
   const router = useRouter()
+  const { currentUser, setCurrentUser } = useStore()
   const [activeTab, setActiveTab] = useState("overview")
+
+  // Set current user if not set
+  useEffect(() => {
+    if (!currentUser || currentUser.role !== "VESSEL_MANAGER") {
+      setCurrentUser({
+        role: "VESSEL_MANAGER",
+        name: "Vessel Manager",
+        email: "vessel-manager@fuelsense.com",
+      })
+    }
+  }, [currentUser, setCurrentUser])
+
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case "overview":
+        return <OverviewTab />
+      case "vessels":
+        return <VesselsTab />
+      case "maintenance":
+        return <MaintenanceTab />
+      case "compliance":
+        return <ComplianceTab />
+      case "costs":
+        return <CostsTab />
+      default:
+        return <OverviewTab />
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -44,48 +74,16 @@ export default function VesselManagerPage() {
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="container mx-auto px-6 py-6">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="w-full max-w-4xl mb-6">
-            <TabsTrigger value="overview" className="flex-1">
-              Overview
-            </TabsTrigger>
-            <TabsTrigger value="vessels" className="flex-1">
-              Vessels
-            </TabsTrigger>
-            <TabsTrigger value="maintenance" className="flex-1">
-              Maintenance
-            </TabsTrigger>
-            <TabsTrigger value="compliance" className="flex-1">
-              Compliance
-            </TabsTrigger>
-            <TabsTrigger value="costs" className="flex-1">
-              Costs
-            </TabsTrigger>
-          </TabsList>
+      {/* Main Layout with Sidebar */}
+      <div className="flex">
+        {/* Sidebar (20%) */}
+        <VesselManagerSidebar activeTab={activeTab} onTabChange={setActiveTab} />
 
-          <TabsContent value="overview" className="space-y-6">
-            <OverviewTab />
-          </TabsContent>
-
-          <TabsContent value="vessels" className="space-y-6">
-            <VesselsTab />
-          </TabsContent>
-
-          <TabsContent value="maintenance" className="space-y-6">
-            <MaintenanceTab />
-          </TabsContent>
-
-          <TabsContent value="compliance" className="space-y-6">
-            <ComplianceTab />
-          </TabsContent>
-
-          <TabsContent value="costs" className="space-y-6">
-            <CostsTab />
-          </TabsContent>
-        </Tabs>
-      </main>
+        {/* Main Content (80%) */}
+        <main className="flex-1 p-6">
+          {renderTabContent()}
+        </main>
+      </div>
     </div>
   )
 }
