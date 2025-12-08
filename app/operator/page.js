@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { differenceInHours, formatDistanceToNow } from "date-fns"
+import { differenceInHours } from "date-fns"
 import { toast } from "sonner"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Notifications } from "@/components/Notifications"
 import { useStore } from "@/lib/store"
-import { BadgeCheck, MapPin, Ship, Users, Zap } from "lucide-react"
+import { MapPin, Ship, Users } from "lucide-react"
 
 export default function OperatorPage() {
   const router = useRouter()

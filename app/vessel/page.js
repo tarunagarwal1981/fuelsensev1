@@ -85,7 +85,7 @@ export default function VesselPage() {
         <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center gap-3">
             <Link href="/" className="flex items-center gap-2">
-              <span className="text-2xl sm:text-3xl">?</span>
+              <span className="text-2xl sm:text-3xl">âš“</span>
               <div className="flex flex-col">
                 <span className="text-lg sm:text-xl font-bold text-gray-900">Fuel Sense</span>
                 <span className="text-[11px] sm:text-xs text-gray-500">Vessel</span>
@@ -127,7 +127,7 @@ export default function VesselPage() {
             <Info title="Vessel" value={selectedVessel?.name || "N/A"} subtitle={`IMO ${selectedVessel?.imo || "-"}`} />
             <Info
               title="Route"
-              value={currentCargo ? `${currentCargo.loadPort} -> ${currentCargo.dischargePort}` : "Not assigned"}
+              value={currentCargo ? `${currentCargo.loadPort} â†’ ${currentCargo.dischargePort}` : "Not assigned"}
               subtitle={`${currentCargo?.distance?.toLocaleString?.() || 0} nm`}
             />
             <Info
@@ -176,10 +176,10 @@ export default function VesselPage() {
             </CardHeader>
             <CardContent className="space-y-2">
               {[
-                { label: "Laden • Good weather", value: `${baseline} MT/day` },
-                { label: "Laden • Bad weather", value: `${baseline + 6} MT/day` },
-                { label: "Ballast • Good weather", value: `${baseline - 4} MT/day` },
-                { label: "Ballast • Bad weather", value: `${baseline + 2} MT/day` },
+                { label: "Laden â€¢ Good weather", value: `${baseline} MT/day` },
+                { label: "Laden â€¢ Bad weather", value: `${baseline + 6} MT/day` },
+                { label: "Ballast â€¢ Good weather", value: `${baseline - 4} MT/day` },
+                { label: "Ballast â€¢ Bad weather", value: `${baseline + 2} MT/day` },
               ].map((row) => (
                 <div key={row.label} className="flex items-center justify-between border rounded-md px-3 py-2">
                   <div>
